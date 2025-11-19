@@ -8,7 +8,7 @@ sdcObj <- reactive({
 
 
 inputdata <- reactive({
-  if(is.null(obj$inputdata)) {
+  if (is.null(obj$inputdata)) {
     return(NULL)
   }
   return(obj$inputdata)
@@ -25,12 +25,12 @@ observeEvent(obj$inputdata, {
 })
 
 comptime <- reactive({
-  z <- as.difftime(obj$comptime, units="secs")
+  z <- as.difftime(obj$comptime, units = "secs")
 
-  if (obj$comptime <60) {
-    return(paste(round(as.numeric(z, units="secs"), digits=2),"seconds"))
+  if (obj$comptime < 60) {
+    return(paste(round(as.numeric(z, units = "secs"), digits = 2), "seconds"))
   } else {
-    return(paste(round(as.numeric(z, units="mins"), digits=2),"minutes"))
+    return(paste(round(as.numeric(z, units = "mins"), digits = 2), "minutes"))
   }
 })
 
@@ -40,7 +40,7 @@ anonPerformed <- reactive({
   if (is.null(res)) {
     return(NULL)
   }
-  if (length(res)==0) {
+  if (length(res) == 0) {
     return(NULL)
   }
   res
@@ -52,7 +52,7 @@ numVars <- reactive({
   if (is.null(inp)) {
     return(NULL)
   }
-  names(inp)[sapply(inp, class)%in% c("numeric","integer")]
+  names(inp)[sapply(inp, class) %in% c("numeric", "integer")]
 })
 
 # all factor variables in inputdata
@@ -88,7 +88,7 @@ allVars <- reactive({
   cl <- sapply(1:ncol(inp), function(x) {
     class(inp[[x]])
   })
-  names(cn) <- paste0(cn," (",cl,")")
+  names(cn) <- paste0(cn, " (", cl, ")")
   cn
 })
 
@@ -259,8 +259,8 @@ get_all_factorvars_name <- reactive({
   if (is.null(curObj)) {
     return(NULL)
   }
-  tmp <- get.sdcMicroObj(curObj, type="origData")
-  names(tmp)[sapply(tmp, class)%in% c("factor")]
+  tmp <- get.sdcMicroObj(curObj, type = "origData")
+  names(tmp)[sapply(tmp, class) %in% c("factor")]
 })
 # all numeric/integer variables
 get_all_integervars_name <- reactive({
@@ -268,16 +268,16 @@ get_all_integervars_name <- reactive({
   if (is.null(curObj)) {
     return(NULL)
   }
-  tmp <- get.sdcMicroObj(curObj, type="origData")
-  names(tmp)[sapply(tmp, class)%in% c("integer")]
+  tmp <- get.sdcMicroObj(curObj, type = "origData")
+  names(tmp)[sapply(tmp, class) %in% c("integer")]
 })
 get_all_numericvars_name <- reactive({
   curObj <- sdcObj()
   if (is.null(curObj)) {
     return(NULL)
   }
-  tmp <- get.sdcMicroObj(curObj, type="origData")
-  names(tmp)[sapply(tmp, class)%in% c("numeric")]
+  tmp <- get.sdcMicroObj(curObj, type = "origData")
+  names(tmp)[sapply(tmp, class) %in% c("numeric")]
 })
 
 get_allNumericVars_name <- reactive({
@@ -321,19 +321,19 @@ possGhostVars <- reactive({
   if (is.null(sdcObj())) {
     return(NULL)
   }
-  out <- list(kv=c(), gv=c())
+  out <- list(kv = c(), gv = c())
 
   xx <- obj$sdcObj
-  cn <- colnames(get.sdcMicroObj(xx, type="origData"))
+  cn <- colnames(get.sdcMicroObj(xx, type = "origData"))
 
-  kv <- cn[get.sdcMicroObj(xx, type="keyVars")]
-  nv <- cn[get.sdcMicroObj(xx, type="numVars")]
-  pv <- cn[get.sdcMicroObj(xx, type="pramVars")]
-  wv <- cn[get.sdcMicroObj(xx, type="weightVar")]
-  hhid <- cn[get.sdcMicroObj(xx, type="hhId")]
-  sv <- cn[get.sdcMicroObj(xx, type="strataVar")]
+  kv <- cn[get.sdcMicroObj(xx, type = "keyVars")]
+  nv <- cn[get.sdcMicroObj(xx, type = "numVars")]
+  pv <- cn[get.sdcMicroObj(xx, type = "pramVars")]
+  wv <- cn[get.sdcMicroObj(xx, type = "weightVar")]
+  hhid <- cn[get.sdcMicroObj(xx, type = "hhId")]
+  sv <- cn[get.sdcMicroObj(xx, type = "strataVar")]
   non_poss <- c(kv, nv, pv, wv, hhid, sv)
-  gv <- get.sdcMicroObj(xx, type="ghostVars")
+  gv <- get.sdcMicroObj(xx, type = "ghostVars")
   if (!is.null(gv)) {
     ex_gv <- cn[unlist(sapply(gv, function(x) {
       x[[2]]
@@ -352,7 +352,7 @@ exportData <- reactive({
   if (is.null(curObj)) {
     return(NULL)
   }
-  extractManipData(curObj, randomizeRecords=input$rb_export_randomizeorder)
+  extractManipData(curObj, randomizeRecords = input$rb_export_randomizeorder)
 })
 
 # compute some risk-measures
@@ -365,23 +365,23 @@ measure_riskComp <- reactive({
   res <- list()
   risk <- obj$sdcObj@risk
   originalRisk <- obj$sdcObj@originalRisk
-  res$s <- sum((risk$individual[,1] > median(risk$individual[,1])+2*mad(risk$individual[,1])) & (risk$individual[,1] > bm))
-  res$sorig <- sum((originalRisk$individual[,1] > median(originalRisk$individual[,1])+2*mad(originalRisk$individual[,1])) & (originalRisk$individual[,1] > bm))
+  res$s <- sum((risk$individual[, 1] > median(risk$individual[, 1]) + 2 * mad(risk$individual[, 1])) & (risk$individual[, 1] > bm))
+  res$sorig <- sum((originalRisk$individual[, 1] > median(originalRisk$individual[, 1]) + 2 * mad(originalRisk$individual[, 1])) & (originalRisk$individual[, 1] > bm))
   res$benchmark <- bm
 
-  res$exp_reident_m <- round(risk$global$risk_ER,2)
-  res$exp_reident_mp <- round(risk$global$risk_pct,2)
-  res$exp_reident_o <- round(originalRisk$global$risk_ER,2)
-  res$exp_reident_op <- round(originalRisk$global$risk_pct,2)
+  res$exp_reident_m <- round(risk$global$risk_ER, 2)
+  res$exp_reident_mp <- round(risk$global$risk_pct, 2)
+  res$exp_reident_o <- round(originalRisk$global$risk_ER, 2)
+  res$exp_reident_op <- round(originalRisk$global$risk_pct, 2)
 
   res$hierrisk <- FALSE
-  if ("hier_risk_ER"%in%names(risk$global)) {
+  if ("hier_risk_ER" %in% names(risk$global)) {
     if (!is.na(risk$global$hier_risk_ER)) {
       res$hierrisk <- TRUE
-      res$hier_exp_m <- round(risk$global$hier_risk_ER,2)
-      res$hier_exp_mp <- round(risk$global$hier_risk_pct,2)
-      res$hier_exp_o <- round(originalRisk$global$hier_risk_ER,2)
-      res$hier_exp_op <- round(originalRisk$global$hier_risk_pct,2)
+      res$hier_exp_m <- round(risk$global$hier_risk_ER, 2)
+      res$hier_exp_mp <- round(risk$global$hier_risk_pct, 2)
+      res$hier_exp_o <- round(originalRisk$global$hier_risk_ER, 2)
+      res$hier_exp_op <- round(originalRisk$global$hier_risk_pct, 2)
     } else {
       res$hier <- NA
     }
@@ -403,40 +403,42 @@ info_localsupp <- reactive({
 infodat <- reactive({
   # important variables
   kV <- get_keyVars_names()
-  if (length(kV)==0 ) {
+  if (length(kV) == 0) {
     return(NULL)
   }
-  df <- data.frame(Variable=kV, type="cat. key variable", Suppressions=0)
+  df <- data.frame(Variable = kV, type = "cat. key variable", Suppressions = 0)
 
   ls <- info_localsupp()
   if (!is.null(ls)) {
-    df$Suppressions <- as.integer(ls[1,])
+    df$Suppressions <- as.integer(ls[1, ])
   }
 
   nV <- get_numVars_names()
-  if (length(nV)>0) {
-    df <- rbind(df, data.frame(Variable=nV, type="num. key variable", Suppressions=NA))
+  if (length(nV) > 0) {
+    df <- rbind(df, data.frame(Variable = nV, type = "num. key variable", Suppressions = NA))
   }
   wV <- get_weightVar_name()
-  if (length(wV)>0) {
-    df <- rbind(df, data.frame(Variable=wV, type="sampling weight", Suppressions=NA))
+  if (length(wV) > 0) {
+    df <- rbind(df, data.frame(Variable = wV, type = "sampling weight", Suppressions = NA))
   }
   sV <- get_strataVar_names()
-  if (length(sV)>0) {
-    df <- rbind(df, data.frame(Variable=sV, type="strata", Suppressions=NA))
+  if (length(sV) > 0) {
+    df <- rbind(df, data.frame(Variable = sV, type = "strata", Suppressions = NA))
   }
 
   pV <- get_pramVars_names()
-  if (length(pV)>0) {
-    df <- rbind(df, data.frame(Variable=pV, type="PRAM variable", Suppressions=NA))
+  if (length(pV) > 0) {
+    df <- rbind(df, data.frame(Variable = pV, type = "PRAM variable", Suppressions = NA))
   }
 
   # params
   res <- obj$sdcObj@options
-  params <- data.frame(Parameter=c("number of records","alpha","random seed"),
-    Value=c(nrow(obj$inputdata), res$alpha,res$seed))
+  params <- data.frame(
+    Parameter = c("number of records", "alpha", "random seed"),
+    Value = c(nrow(obj$inputdata), res$alpha, res$seed)
+  )
   params$Value <- as.character(params$Value)
-  list(df=df, params=params)
+  list(df = df, params = params)
 })
 
 # return value labels from stata (if any)
@@ -452,34 +454,34 @@ calc_ldiv_result <- reactive({
     return(NULL)
   }
 
-  inpdat <- extractManipData(curObj, randomizeRecords="no")
+  inpdat <- extractManipData(curObj, randomizeRecords = "no")
   keyVars <- get_keyVars_names()
   sensVars <- input$ldiv_sensvar
-  ldiv <- ldiversity(obj=inpdat, keyVars=keyVars, ldiv_index=sensVars, l_recurs_c=input$ldiv_recconst, missing=NA)
+  ldiv <- ldiversity(obj = inpdat, keyVars = keyVars, ldiv_index = sensVars, l_recurs_c = input$ldiv_recconst, missing = NA)
   risk <- curObj@risk
 
   # table with violating observations
-  ldiv2 <- ldiv[,grep("_Distinct_Ldiversity",colnames(ldiv)),drop=FALSE]
+  ldiv2 <- ldiv[, grep("_Distinct_Ldiversity", colnames(ldiv)), drop = FALSE]
   for (i in 1:ncol(ldiv2)) {
-    ss <- summary(ldiv2[,i])
-    if (i==1) {
-      df <- data.frame(stats=names(ss), value=as.numeric(ss))
+    ss <- summary(ldiv2[, i])
+    if (i == 1) {
+      df <- data.frame(stats = names(ss), value = as.numeric(ss))
     } else {
       df <- cbind(df, data.frame(as.numeric(ss)))
     }
   }
   colnames(df) <- c("stats", colnames(ldiv2))
-  fk <- risk$individual[,2]
-  TFfk <- apply(ldiv2,1,function(x)any(x<input$ldiv_recconst))
+  fk <- risk$individual[, 2]
+  TFfk <- apply(ldiv2, 1, function(x) any(x < input$ldiv_recconst))
   if (!any(TFfk)) {
     tab <- data.frame()
   } else {
-    tab <- cbind(ldiv2[TFfk,],fk[TFfk],inpdat[TFfk,])
+    tab <- cbind(ldiv2[TFfk, ], fk[TFfk], inpdat[TFfk, ])
     colnames(tab)[1:ncol(ldiv2)] <- colnames(ldiv2)
-    colnames(tab)[ncol(ldiv2)+1] <- "fk"
-    tab <- tab[order(tab[,1]),]
+    colnames(tab)[ncol(ldiv2) + 1] <- "fk"
+    tab <- tab[order(tab[, 1]), ]
   }
-  return(list(tab=tab, df=df))
+  return(list(tab = tab, df = df))
 })
 
 # current result of ldiversity-calculation
@@ -493,16 +495,16 @@ calc_suda2_result <- reactive({
   if (is.null(curObj)) {
     return(NULL)
   }
-  inpdat <- extractManipData(curObj, randomizeRecords="no")
+  inpdat <- extractManipData(curObj, randomizeRecords = "no")
   keyVars <- get_keyVars_names()
-  suda2 <- suda2(obj=inpdat, variables=keyVars, missing=NA, DisFraction=input$suda2_disf)
+  suda2 <- suda2(obj = inpdat, variables = keyVars, missing = NA, DisFraction = input$suda2_disf)
 
   SEQ <- seq(0, 0.7, 0.1) + .Machine$double.eps
-  DISSudaScore <- c("== 0", "(0.0, 0.1]","(0.1, 0.2]", "(0.2, 0.3]", "(0.3, 0.4]", "(0.4, 0.5]", "(0.5, 0.6]", "(0.6, 0.7]","> 0.7")
+  DISSudaScore <- c("== 0", "(0.0, 0.1]", "(0.1, 0.2]", "(0.2, 0.3]", "(0.3, 0.4]", "(0.4, 0.5]", "(0.5, 0.6]", "(0.6, 0.7]", "> 0.7")
   tab <- table(cut(suda2$disScore, breaks = c(-1, SEQ, Inf)))
   df_thresholds <- data.frame(interval = DISSudaScore, "number of records" = as.integer(tab))
   colnames(df_thresholds) <- c("Interval", "Number of records")
-  return(list(thresholds=df_thresholds, attribute_contributions=suda2$attribute_contributions, DisFraction=input$suda2_disf))
+  return(list(thresholds = df_thresholds, attribute_contributions = suda2$attribute_contributions, DisFraction = input$suda2_disf))
 })
 
 # current result of suda2-calculation

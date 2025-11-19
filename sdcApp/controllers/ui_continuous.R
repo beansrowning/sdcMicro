@@ -4,7 +4,7 @@ has_numkeyvars <- reactive({
   if (is.null(curObj)) {
     return(NULL)
   }
-  length(get.sdcMicroObj(curObj, type="numVars"))>0
+  length(get.sdcMicroObj(curObj, type = "numVars")) > 0
 })
 
 # UI-output for top/bottom-coding of numerical variables
@@ -38,24 +38,30 @@ output$ui_topbotcoding_num <- renderUI({
     } else {
       vv <- curObj@origData[[curV]]
     }
-    boxplot(vv, main=input$sel_topbot_var_num, xlab=input$sel_topbot_var_num, col="#DADFE1")
+    boxplot(vv, main = input$sel_topbot_var_num, xlab = input$sel_topbot_var_num, col = "#DADFE1")
   })
   output$ui_topbot_params_num <- renderUI({
     txt_tooltip1 <- "In case of top, all values above the threshold are replaced, in the case of bottom, all values below the threshold are replaced."
     txt_tooltip2 <- "All values below (bottom) or above (top) this threshold are replaced with the replacement value."
     txt_tooltip3 <- "The replacement value is the value that replaces all the values below (bottom) or above (top) the specified threshold. Often the replacement value is the same as the threshold value."
-    sel_var <- selectInput("sel_topbot_var_num", choices=numVars(), selected=obj$inp_sel_topbot_var_num, multiple=FALSE, label=p("Select variable"), width="75%")
-    sel_kind <- radioButtons("sel_topbot_kind_num", choices=c("top","bottom"),
-      label=p("Apply top/bottom coding?", tipify(icon("circle-info"), title=txt_tooltip1, placement="top")), inline=TRUE)
-    txt_val <- textInput("num_topbot_val_num", label=p("Set threshold value", tipify(icon("circle-info"), title=txt_tooltip2, placement="top")),
-      placeholder="Please enter a number", width="75%")
-    txt_replace <- textInput("num_topbot_replacement_num", label=p("Set replacement value", tipify(icon("circle-info"), title=txt_tooltip3, placement="top")),
-      placeholder="Please enter a number", width="75%")
-    out <- fluidRow(column(6, sel_var, align="center"), column(6, sel_kind, align="center"))
-    out <- list(out, fluidRow(column(6, txt_val, align="center"), column(6, txt_replace, align="center")))
+    sel_var <- selectInput("sel_topbot_var_num", choices = numVars(), selected = obj$inp_sel_topbot_var_num, multiple = FALSE, label = p("Select variable"), width = "75%")
+    sel_kind <- radioButtons("sel_topbot_kind_num",
+      choices = c("top", "bottom"),
+      label = p("Apply top/bottom coding?", tipify(icon("circle-info"), title = txt_tooltip1, placement = "top")), inline = TRUE
+    )
+    txt_val <- textInput("num_topbot_val_num",
+      label = p("Set threshold value", tipify(icon("circle-info"), title = txt_tooltip2, placement = "top")),
+      placeholder = "Please enter a number", width = "75%"
+    )
+    txt_replace <- textInput("num_topbot_replacement_num",
+      label = p("Set replacement value", tipify(icon("circle-info"), title = txt_tooltip3, placement = "top")),
+      placeholder = "Please enter a number", width = "75%"
+    )
+    out <- fluidRow(column(6, sel_var, align = "center"), column(6, sel_kind, align = "center"))
+    out <- list(out, fluidRow(column(6, txt_val, align = "center"), column(6, txt_replace, align = "center")))
     out
   })
-  observeEvent(input$sel_topbot_var_num,{
+  observeEvent(input$sel_topbot_var_num, {
     obj$inp_sel_topbot_var_num <- input$sel_topbot_var_num
   })
   output$ui_topbot_btn_num <- renderUI({
@@ -78,16 +84,16 @@ output$ui_topbotcoding_num <- renderUI({
       } else {
         vv <- curObj@origData[[input$sel_topbot_var_num]]
       }
-      if (input$sel_topbot_kind_num=="top") {
-        n <- sum(vv >= num1, na.rm=TRUE)
+      if (input$sel_topbot_kind_num == "top") {
+        n <- sum(vv >= num1, na.rm = TRUE)
       } else {
-        n <- sum(vv <= num1, na.rm=TRUE)
+        n <- sum(vv <= num1, na.rm = TRUE)
       }
       N <- length(na.omit(vv))
-      p <- formatC(100*(n/N), format="f", digits=2)
+      p <- formatC(100 * (n / N), format = "f", digits = 2)
       return(fluidRow(
-        column(12, p(code(n),"(out of",code(N),") values will be replaced! This equals",code(p),"percent of the data."), align="center"),
-        column(12, myActionButton("btn_topbotcoding_num",label=("Apply Top/Bottom-Coding"), "primary"), align="center")
+        column(12, p(code(n), "(out of", code(N), ") values will be replaced! This equals", code(p), "percent of the data."), align = "center"),
+        column(12, myActionButton("btn_topbotcoding_num", label = ("Apply Top/Bottom-Coding"), "primary"), align = "center")
       ))
     } else {
       return(NULL)
@@ -107,7 +113,8 @@ output$ui_microaggregation_header <- renderUI({
   out <- fluidRow(
     column(12, h4("Microaggregation for numerical variables"), offset = 0, class = "wb-header"),
     column(12, p("Many different algorithms to microaggregate numeric key variables can be applied here. The most important
-                 parameter is the",code("aggregation level"), "because it specifies how many observations are grouped together before replacing actual values with some kind of aggregate."), offset = 0, class = "wb-header-hint"))
+                 parameter is the", code("aggregation level"), "because it specifies how many observations are grouped together before replacing actual values with some kind of aggregate."), offset = 0, class = "wb-header-hint")
+  )
   out
 })
 output$ui_microaggregation <- renderUI({
@@ -116,10 +123,10 @@ output$ui_microaggregation <- renderUI({
     if (is.null(input$rb_microagg_cluster)) {
       return(NULL)
     }
-    if (input$rb_microagg_cluster=="Yes") {
+    if (input$rb_microagg_cluster == "Yes") {
       return(c("influence", "clustpca", "clustmcdpca", "clustpppca"))
     } else {
-      return(c("mdav", "rmd", "simple", "single","onedims", "pca", "mcdpca", "pppca"))
+      return(c("mdav", "rmd", "simple", "single", "onedims", "pca", "mcdpca", "pppca"))
     }
   })
 
@@ -139,35 +146,40 @@ output$ui_microaggregation <- renderUI({
     txt_clnrcl <- "Specifies the number of clusters generated by the clustering algorithm"
 
     rb_clustermethod <- radioButtons("rb_microagg_clustermethod",
-      label=p("Clustermethod", tipify(icon("circle-info"), title=txt_clmethod, placement="top")),
-      choices=c("clara","pam","kmeans","cmeans","bclust"), width="100%", selected=input$rb_microagg_clustermethod, inline=TRUE)
+      label = p("Clustermethod", tipify(icon("circle-info"), title = txt_clmethod, placement = "top")),
+      choices = c("clara", "pam", "kmeans", "cmeans", "bclust"), width = "100%", selected = input$rb_microagg_clustermethod, inline = TRUE
+    )
 
     rb_transf <- radioButtons("rb_microagg_transf",
-      label=p("Transformation", tipify(icon("circle-info"), title=txt_cltransf, placement="top")),
-      choices=c("none","log","boxcox"), width="100%", selected=input$rb_microagg_transf, inline=TRUE)
+      label = p("Transformation", tipify(icon("circle-info"), title = txt_cltransf, placement = "top")),
+      choices = c("none", "log", "boxcox"), width = "100%", selected = input$rb_microagg_transf, inline = TRUE
+    )
 
     sl_nc <- isolate(sliderInput("sl_microagg_nc",
-      label=p("Number of clusters", tipify(icon("circle-info"), title=txt_clnrcl, placement="top")),
-      min=1, max=15, step=1, value=3, width="100%"))
+      label = p("Number of clusters", tipify(icon("circle-info"), title = txt_clnrcl, placement = "top")),
+      min = 1, max = 15, step = 1, value = 3, width = "100%"
+    ))
 
     return(fluidRow(
-      column(4, rb_clustermethod, align="center"),
-      column(4, rb_transf, align="center"),
-      column(4, sl_nc, align="center")
+      column(4, rb_clustermethod, align = "center"),
+      column(4, rb_transf, align = "center"),
+      column(4, sl_nc, align = "center")
     ))
   })
   output$ui_microagg_strata <- renderUI({
     txt_tooltip <- "By default microaggregation is applied on the complete dataset. To apply the algorithm within strata, select a variable for stratification. The algorithm is then applied within the strata defined by the factor levels of that variable."
     selectInput("sel_microagg_strata",
-      label=p("Apply microaggregation in groups (stratification)?", tipify(icon("circle-info"), title=txt_tooltip, placement="top")),
-      choices=c("no stratification", poss_strataVarP()), multiple=FALSE, width="100%", selected=input$sel_microagg_strata)
+      label = p("Apply microaggregation in groups (stratification)?", tipify(icon("circle-info"), title = txt_tooltip, placement = "top")),
+      choices = c("no stratification", poss_strataVarP()), multiple = FALSE, width = "100%", selected = input$sel_microagg_strata
+    )
   })
   output$ui_microagg_use_cluster <- renderUI({
     txt_tooltip <- "Cluster-based methods consists of two steps: first creating cluster and subsequently applying microaggregation methods within clusters. Several clustering methods can be chosen as well as parameters for these methods."
     txt_tooltip <- paste0(txt_tooltip, "Clustering observations before applying microaggregation might be useful since the selected microaggregation algorithm is applied within clusters with a higher degree of homogeneity possibly resulting in lower levels of information loss.")
     radioButtons("rb_microagg_cluster",
-      label=p("Use a cluster-based method?", tipify(icon("circle-info"), title=txt_tooltip, placement="bottom")),
-      choices=c("No","Yes"), selected=input$rb_microagg_cluster, inline=TRUE, width="100%")
+      label = p("Use a cluster-based method?", tipify(icon("circle-info"), title = txt_tooltip, placement = "bottom")),
+      choices = c("No", "Yes"), selected = input$rb_microagg_cluster, inline = TRUE, width = "100%"
+    )
   })
   output$ui_microagg_method <- renderUI({
     req(input$rb_microagg_cluster)
@@ -185,27 +197,32 @@ output$ui_microaggregation <- renderUI({
     txtClus <- paste(txtClus, "<strong>clustpca</strong> - see pca, applied for within each cluster<br />")
     txtClus <- paste(txtClus, "<strong>clustmcdpca</strong> - see mcdpca, applied for within each cluster<br />")
     txtClus <- paste(txtClus, "<strong>clustpppca</strong> - see pppca, applied for within each cluster<br />")
-    if (input$rb_microagg_cluster=="No") {
+    if (input$rb_microagg_cluster == "No") {
       sel_method <- selectInput("sel_microagg_method",
-        label=p("Select the method", tipify(icon("circle-info"), title=txt, placement="bottom")),
-        choices=choices_aggmethods(), selected=input$sel_microagg_method, width="100%")
+        label = p("Select the method", tipify(icon("circle-info"), title = txt, placement = "bottom")),
+        choices = choices_aggmethods(), selected = input$sel_microagg_method, width = "100%"
+      )
     } else {
       sel_method <- selectInput("sel_microagg_method",
-        label=p("Select the method", tipify(icon("circle-info"), title=txtClus, placement="bottom")),
-        choices=choices_aggmethods(), selected=input$sel_microagg_method, width="100%")
+        label = p("Select the method", tipify(icon("circle-info"), title = txtClus, placement = "bottom")),
+        choices = choices_aggmethods(), selected = input$sel_microagg_method, width = "100%"
+      )
     }
   })
   output$ui_microagg_vars <- renderUI({
     txt_tooltip <- "Select numeric key variables for microaggregation. If no variables are selected, microaggregation is applied to all numeric key variables. If microaggregation is applied simultaneously to several variables, the results are different as the relationship between the variables is used."
-    selectInput("sel_microagg_v", choices=possvars_numericmethods(),
-      label=p("Select variables for microaggregation", tipify(icon("circle-info"), title=txt_tooltip, placement="top")),
-      selected=input$sel_microagg_v, width="100%", multiple=TRUE)
+    selectInput("sel_microagg_v",
+      choices = possvars_numericmethods(),
+      label = p("Select variables for microaggregation", tipify(icon("circle-info"), title = txt_tooltip, placement = "top")),
+      selected = input$sel_microagg_v, width = "100%", multiple = TRUE
+    )
   })
   output$ui_microagg_agglevel <- renderUI({
     txt_tooltip <- "Specifies the group size"
     sliderInput("sl_microagg_aggr",
-      label=p("Aggregation-level", tipify(icon("circle-info"), title=txt_tooltip, placement="top")),
-      min=1, max=15, step=1, value=3, width="100%")
+      label = p("Aggregation-level", tipify(icon("circle-info"), title = txt_tooltip, placement = "top")),
+      min = 1, max = 15, step = 1, value = 3, width = "100%"
+    )
   })
   output$ui_microagg_aggmeasures <- renderUI({
     txt_tooltip <- "Specifies the group statistic that replaces all values in a group.  The default is the mean, but other measures of location can be used, especially when the group size for aggregation is larger than 3.<br />"
@@ -214,56 +231,62 @@ output$ui_microaggregation <- renderUI({
     txt_tooltip <- paste(txt_tooltip, "<strong>trim</strong> - trimmed mean, specify trimming percentage <br />")
     txt_tooltip <- paste(txt_tooltip, "<strong>onestep</strong> - for each group, values further than 2.018843 times the median absolute deviation from the group median are replaced by the extreme values of this interval and subsequently the group mean is computed and used as replacement value <br />")
     radioButtons("sl_microagg_measure",
-      label=p("Aggregation statistics", tipify(icon("circle-info"), title=txt_tooltip, placement="top")),
-      choices=c("mean", "median", "trim", "onestep"), width="100%", selected=input$sl_microagg_measure, inline=TRUE)
+      label = p("Aggregation statistics", tipify(icon("circle-info"), title = txt_tooltip, placement = "top")),
+      choices = c("mean", "median", "trim", "onestep"), width = "100%", selected = input$sl_microagg_measure, inline = TRUE
+    )
   })
   output$ui_microagg_trim <- renderUI({
     txt_tooltip <- "Sets the trimming percentage if the aggregation statistic is trim. For other methods, this is ignored."
     sliderInput("sl_microagg_trim",
-      label=p("Trimming-percentage", tipify(icon("circle-info"), title=txt_tooltip, placement="top")),
-      min=0, max=0.5, step=0.01, value=0, width="100%")
+      label = p("Trimming-percentage", tipify(icon("circle-info"), title = txt_tooltip, placement = "top")),
+      min = 0, max = 0.5, step = 0.01, value = 0, width = "100%"
+    )
   })
   output$ui_microagg_varsort <- renderUI({
     txt_tooltip <- "Select sorting variable for method ‘simple’ for sorting the records."
     sel_varsort <- selectInput("sel_microagg_varsort",
-      label=p("Select variable for sorting", tipify(icon("circle-info"), title=txt_tooltip, placement="top")),
-      choices=get_allNumericVars_name(), selected=input$sel_microagg_varsort, width="100%")
+      label = p("Select variable for sorting", tipify(icon("circle-info"), title = txt_tooltip, placement = "top")),
+      choices = get_allNumericVars_name(), selected = input$sel_microagg_varsort, width = "100%"
+    )
   })
 
   out <- list(fluidRow(
-    column(4, uiOutput("ui_microagg_use_cluster"), align="center"),
-    column(4, uiOutput("ui_microagg_method"), align="center"),
-    column(4, uiOutput("ui_microagg_strata"), align="center")
+    column(4, uiOutput("ui_microagg_use_cluster"), align = "center"),
+    column(4, uiOutput("ui_microagg_method"), align = "center"),
+    column(4, uiOutput("ui_microagg_strata"), align = "center")
   ))
 
   # simple, onedims, pca, mcdpca, pppca: --> aggr, measure, trim
   # single: --> aggr, measure, trim, varsort
   # influence, clustpca, clustmcdpca, clustpppca: --> aggr, measure, trim, clustermethod, transf, nc
   # rmd, mdav: aggr,
-  if ( !is.null(input$sel_microagg_method) ) {
+  if (!is.null(input$sel_microagg_method)) {
     out <- list(out, fluidRow(
-      column(6, uiOutput("ui_microagg_agglevel"), align="center"),
-      column(6, uiOutput("ui_microagg_vars"), align="center")))
-    if (!input$sel_microagg_method %in% c("mdav","rmd")) {
-      if (input$sel_microagg_method=="single") {
+      column(6, uiOutput("ui_microagg_agglevel"), align = "center"),
+      column(6, uiOutput("ui_microagg_vars"), align = "center")
+    ))
+    if (!input$sel_microagg_method %in% c("mdav", "rmd")) {
+      if (input$sel_microagg_method == "single") {
         out <- list(out, fluidRow(
-          column(4, uiOutput("ui_microagg_aggmeasures"), align="center"),
-          column(4, uiOutput("ui_microagg_trim"), align="center"),
-          column(4, uiOutput("ui_microagg_varsort"), align="center")))
+          column(4, uiOutput("ui_microagg_aggmeasures"), align = "center"),
+          column(4, uiOutput("ui_microagg_trim"), align = "center"),
+          column(4, uiOutput("ui_microagg_varsort"), align = "center")
+        ))
       } else {
         out <- list(out, fluidRow(
-          column(6, uiOutput("ui_microagg_aggmeasures"), align="center"),
-          column(6, uiOutput("ui_microagg_trim"), align="center")))
+          column(6, uiOutput("ui_microagg_aggmeasures"), align = "center"),
+          column(6, uiOutput("ui_microagg_trim"), align = "center")
+        ))
       }
       # cluster-based methods
-      if (input$rb_microagg_cluster=="Yes") {
+      if (input$rb_microagg_cluster == "Yes") {
         out <- list(out, uiOutput("ui_microagg_clusterbased"))
       }
     }
   }
-  btn_microagg <- myActionButton("btn_microagg", label="Perform Microaggregation", "primary")
-  if (has_numkeyvars() | length(input$sel_microagg_v)>0 ) {
-    out <- list(out, fluidRow(column(12, btn_microagg, align="center")))
+  btn_microagg <- myActionButton("btn_microagg", label = "Perform Microaggregation", "primary")
+  if (has_numkeyvars() | length(input$sel_microagg_v) > 0) {
+    out <- list(out, fluidRow(column(12, btn_microagg, align = "center")))
   }
   out
 })
@@ -272,15 +295,16 @@ output$ui_microaggregation <- renderUI({
 output$ui_noise_header <- renderUI({
   out <- fluidRow(
     column(12, h4("Adding Stochastic Noise"), offset = 0, class = "wb-header"),
-    column(12, p("Here you can use various methods to add noise in order to perturb continuous variables. Note: stochastic noise is a probabilistic method and the results differ depending on the current seed for the random number generator."), offset = 0, class = "wb-header-hint"))
+    column(12, p("Here you can use various methods to add noise in order to perturb continuous variables. Note: stochastic noise is a probabilistic method and the results differ depending on the current seed for the random number generator."), offset = 0, class = "wb-header-hint")
+  )
   out
 })
 output$ui_noise <- renderUI({
   # returns possible methods for addNoise()
   # 'correlated' needs at least two columns=variables
   choices_noise <- reactive({
-    m <- c("additive","correlated2","restr","ROMM","outdect")
-    if (length(input$sel_noise_v) >=2 | length(get_numVars_names()) >= 2) {
+    m <- c("additive", "correlated2", "restr", "ROMM", "outdect")
+    if (length(input$sel_noise_v) >= 2 | length(get_numVars_names()) >= 2) {
       m <- c(m, "correlated")
     }
     m
@@ -290,42 +314,43 @@ output$ui_noise <- renderUI({
   # also we have different parameters for methods (noise, p, delta) that we
   # catch with a single slider
   has_nv <- has_numkeyvars()
-  if (!is.null(has_nv) && has_nv==FALSE) {
+  if (!is.null(has_nv) && has_nv == FALSE) {
     return(fluidRow(
-      column(12, h4("The current sdcProblem contains no",code("numerical key variables")), align="center"),
-      column(12, p("However,",code("addNoise()"),"can only be applied on such variables!
-        Please modify the",code("sdcProblem"), align="center"))))
+      column(12, h4("The current sdcProblem contains no", code("numerical key variables")), align = "center"),
+      column(12, p("However,", code("addNoise()"), "can only be applied on such variables!
+        Please modify the", code("sdcProblem"), align = "center"))
+    ))
   }
 
   # ui for slider defining noise, p or delta
   output$ui_noise_slider <- renderUI({
     req(input$sel_noise_method)
-    if (input$sel_noise_method=="correlated2") {
+    if (input$sel_noise_method == "correlated2") {
       txt_tooltip <- "Delta is the parameter that determines the level of noise. The larger delta, the higher the noise level. Please refer to the literature for a more detailed description of the effect of delta."
-      lab <- p("Set amount of noise (parameter 'delta')", tipify(icon("circle-info"), title=txt_tooltip, placement="top"))
-      par <- c(value=0.1, min=0.1, max=2, step=0.01)
-    } else if (input$sel_noise_method=="ROMM") {
+      lab <- p("Set amount of noise (parameter 'delta')", tipify(icon("circle-info"), title = txt_tooltip, placement = "top"))
+      par <- c(value = 0.1, min = 0.1, max = 2, step = 0.01)
+    } else if (input$sel_noise_method == "ROMM") {
       txt_tooltip <- 'Parameter "p" is the multiplication factor for the method ROMM and corresponds to the magnitude of the perturbation. The value zero leads to no changes and the default value 0.001 to virtually no changes.'
-      lab <- p("Set amount of noise (parameter 'p')", tipify(icon("circle-info"), title=txt_tooltip, placement="top"))
-      par <- c(value=0.001, min=0.001, max=0.3, step=0.001)
-    } else if (input$sel_noise_method=="correlated"){
+      lab <- p("Set amount of noise (parameter 'p')", tipify(icon("circle-info"), title = txt_tooltip, placement = "top"))
+      par <- c(value = 0.001, min = 0.001, max = 0.3, step = 0.001)
+    } else if (input$sel_noise_method == "correlated") {
       txt_tooltip <- "The added noise is proportional to the variance in the data. The specified amount of noise is the multiplier for the covariance matrix of the noise. For example, for the default value 150, the covariance matrix of the noise is 1.5 times the covariance matrix of the data. The added noise is generated from a multivariate normal distribution."
-      lab <- p("Set amount of noise (parameter 'noise')", tipify(icon("circle-info"), title=txt_tooltip, placement="top"))
-      par <- c(value=150, min=0, max=300, step=1)
-    } else if (input$sel_noise_method=="restr"){
+      lab <- p("Set amount of noise (parameter 'noise')", tipify(icon("circle-info"), title = txt_tooltip, placement = "top"))
+      par <- c(value = 150, min = 0, max = 300, step = 1)
+    } else if (input$sel_noise_method == "restr") {
       txt_tooltip <- "The size of the noise depends on the parameter noise and the sample size. The higher this parameter, the larger the noise."
-      lab <- p("Set amount of noise (parameter 'noise')", tipify(icon("circle-info"), title=txt_tooltip, placement="top"))
-      par <- c(value=150, min=0, max=300, step=1)
-    } else if (input$sel_noise_method=="outdect"){
+      lab <- p("Set amount of noise (parameter 'noise')", tipify(icon("circle-info"), title = txt_tooltip, placement = "top"))
+      par <- c(value = 150, min = 0, max = 300, step = 1)
+    } else if (input$sel_noise_method == "outdect") {
       txt_tooltip <- "The added noise is proportional to the variance in the data. The specified amount of noise is the multiplier for the standard deviation of the noise. For example, for the default value 150, the standard deviation of the noise is 1.5 times the standard deviation in the data."
-      lab <- p("Set amount of noise (parameter 'noise')", tipify(icon("circle-info"), title=txt_tooltip, placement="top"))
-      par <- c(value=150, min=0, max=300, step=1)
+      lab <- p("Set amount of noise (parameter 'noise')", tipify(icon("circle-info"), title = txt_tooltip, placement = "top"))
+      par <- c(value = 150, min = 0, max = 300, step = 1)
     } else {
       txt_tooltip <- "The added noise is proportional to the variance in the data. The specified amount of noise is the multiplier for the standard deviation of the noise. For example, for the default value 150, the standard deviation of the noise is 1.5 times the standard deviation in the data. The added noise is generated from a univariate normal distribution."
-      lab <- p("Set amount of noise (parameter 'noise')", tipify(icon("circle-info"), title=txt_tooltip, placement="top"))
-      par <- c(value=150, min=0, max=300, step=1)
+      lab <- p("Set amount of noise (parameter 'noise')", tipify(icon("circle-info"), title = txt_tooltip, placement = "top"))
+      par <- c(value = 150, min = 0, max = 300, step = 1)
     }
-    sliderInput("sl_noise_noise", label=lab, min=par["min"], max=par["max"], step=par["step"], value=par["value"], width="100%")
+    sliderInput("sl_noise_noise", label = lab, min = par["min"], max = par["max"], step = par["step"], value = par["value"], width = "100%")
   })
 
   # ui for selection of method
@@ -338,23 +363,26 @@ output$ui_noise <- renderUI({
     txt_tooltip <- paste0(txt_tooltip, "<strong>outdect</strong> - adds noise only to outliers in the data. The outliers are identified with univariate and robust multivariate procedures based on a robust Mahalanobis distance calculated by the MCD estimator.<br />")
     txt_tooltip <- paste0(txt_tooltip, "<strong>correlated</strong> - adds noise and preserves the covariance matrix")
     selectInput("sel_noise_method",
-      label=p("Select the algorithm", tipify(icon("circle-info"), title=txt_tooltip, placement="bottom")),
-      choices=choices_noise(), selected=input$sel_noise_method, width="100%")
+      label = p("Select the algorithm", tipify(icon("circle-info"), title = txt_tooltip, placement = "bottom")),
+      choices = choices_noise(), selected = input$sel_noise_method, width = "100%"
+    )
   })
 
   # variables selected
   output$ui_noise_vars <- renderUI({
     txt_tooltip <- 'Note that for some methods, the results are different if noise is added to single variables or to groups of variables. An example is the method "correlated2", which preserves the covariance matrix of the data.'
-    selectInput("sel_noise_v", choices=get_numVars_names(),
-      label=p("Select variables", tipify(icon("circle-info"), title=txt_tooltip, placement="bottom")),
-      width="75%", multiple=TRUE)
+    selectInput("sel_noise_v",
+      choices = get_numVars_names(),
+      label = p("Select variables", tipify(icon("circle-info"), title = txt_tooltip, placement = "bottom")),
+      width = "75%", multiple = TRUE
+    )
   })
 
   observe({
-    if (length(input$sel_noise_v)==1) {
-      updateSelectInput(session, inputId="sel_noise_method", choices = setdiff(choices_noise(), "correlated"))
+    if (length(input$sel_noise_v) == 1) {
+      updateSelectInput(session, inputId = "sel_noise_method", choices = setdiff(choices_noise(), "correlated"))
     } else {
-      updateSelectInput(session, inputId="sel_noise_method", choices = choices_noise())
+      updateSelectInput(session, inputId = "sel_noise_method", choices = choices_noise())
     }
   })
 
@@ -364,49 +392,52 @@ output$ui_noise <- renderUI({
     if (is.null(has_nv)) {
       return(NULL)
     }
-    if (has_numkeyvars() || length(input$sel_noise_v)>0) {
-      btn <- myActionButton("btn_noise", label="Add noise", "primary")
+    if (has_numkeyvars() || length(input$sel_noise_v) > 0) {
+      btn <- myActionButton("btn_noise", label = "Add noise", "primary")
     }
     btn
   })
 
   out <- fluidRow(
-    column(6, uiOutput("ui_noise_vars"), align="center"),
-    column(6, uiOutput("ui_noise_method"), align="center"))
+    column(6, uiOutput("ui_noise_vars"), align = "center"),
+    column(6, uiOutput("ui_noise_method"), align = "center")
+  )
 
-  out <- list(out, fluidRow(column(12, uiOutput("ui_noise_slider"), align="center")))
-  out <- list(out, fluidRow(column(12, uiOutput("ui_noise_btn"), align="center")))
+  out <- list(out, fluidRow(column(12, uiOutput("ui_noise_slider"), align = "center")))
+  out <- list(out, fluidRow(column(12, uiOutput("ui_noise_btn"), align = "center")))
   out
 })
 
 # GUI-output for shuffling()
 output$ui_shuffling <- renderUI({
-  fluidRow(column(12, h4("Shuffling", align="center")))
+  fluidRow(column(12, h4("Shuffling", align = "center")))
 })
 
 # GUI-output for rankSwap()
 output$ui_rankswap_header <- renderUI({
   out <- fluidRow(
     column(12, h4("Rank Swapping"), offset = 0, class = "wb-header"),
-    column(12, p("This is a method to be used on numeric or ordinal variables. The idea is to",tags$i("swap"),"values within a range
+    column(12, p("This is a method to be used on numeric or ordinal variables. The idea is to", tags$i("swap"), "values within a range
                  so that correlation structure of original variables is preserved and some perturbation is applied. Note: rank swapping is a probabilistic method
                  and therefore the results differ depending on the current seed for the random number generator.
-                 Only one of the 3 parameters below will be used to compute the number of swaps."), offset = 0, class = "wb-header-hint"))
+                 Only one of the 3 parameters below will be used to compute the number of swaps."), offset = 0, class = "wb-header-hint")
+  )
   out
 })
 output$ui_rankswap <- renderUI({
   if (!has_numkeyvars()) {
     return(fluidRow(
-      column(12, h4("The current sdcProblem contains no",code("numerical key variables")), align="center"),
-      column(12, p("However,",code("rankSwap()"),"can only be applied on such variables!
-        Please modify the",code("sdcProblem"), align="center"))))
+      column(12, h4("The current sdcProblem contains no", code("numerical key variables")), align = "center"),
+      column(12, p("However,", code("rankSwap()"), "can only be applied on such variables!
+        Please modify the", code("sdcProblem"), align = "center"))
+    ))
   }
 
   # ui for 'btn_rankswap
   output$ui_rankswap_btn <- renderUI({
     btn <- NULL
-    if (has_numkeyvars() | length(input$sel_rankswap_v)>0) {
-      btn <- myActionButton("btn_rankswap", label="Apply rank swapping", "primary")
+    if (has_numkeyvars() | length(input$sel_rankswap_v) > 0) {
+      btn <- myActionButton("btn_rankswap", label = "Apply rank swapping", "primary")
     }
     btn
   })
@@ -414,23 +445,25 @@ output$ui_rankswap <- renderUI({
   output$ui_rankswap_vars <- renderUI({
     txt_tooltip <- "Note that the results are different if rank swapping is applied to single variables or to groups of variables, since the covariance matrix is preserved."
     selectInput("sel_rankswap_v",
-      choices=possvars_numericmethods(), label=p("Select variables", tipify(icon("circle-info"), title=txt_tooltip, placement="top")),
-      width="100%", multiple=TRUE)
+      choices = possvars_numericmethods(), label = p("Select variables", tipify(icon("circle-info"), title = txt_tooltip, placement = "top")),
+      width = "100%", multiple = TRUE
+    )
   })
   output$sl_rankswap_top <- renderUI({
     txt_tooltip <- "The highest values can be top coded before applying rank-swapping in order to protect outliers. This parameter specifies the number of values to be top coded as percentage of the sample size. By default no values are top coded."
     sliderInput("sl_rankswap_top",
-      label=p("Set percentage of highest values that are grouped together before rank swapping", tipify(icon("circle-info"), title=txt_tooltip, placement="top")),
-      min=0, max=25, step=1, value=0, width="100%")
+      label = p("Set percentage of highest values that are grouped together before rank swapping", tipify(icon("circle-info"), title = txt_tooltip, placement = "top")),
+      min = 0, max = 25, step = 1, value = 0, width = "100%"
+    )
   })
   output$sl_rankswap_bot <- renderUI({
     txt_tooltip <- "The lowest values can be bottom coded before applying rank-swapping in order to protect outliers. This parameter specifies the number of values to be bottom coded as percentage of the sample size. By default no values are bottom coded."
     sliderInput("sl_rankswap_bot",
-      label=p("Set percentage of lowest values that are grouped together before rank swapping", tipify(icon("circle-info"), title=txt_tooltip, placement="top")),
-      min=0, max=25, step=1, value=0, width="100%")
-
+      label = p("Set percentage of lowest values that are grouped together before rank swapping", tipify(icon("circle-info"), title = txt_tooltip, placement = "top")),
+      min = 0, max = 25, step = 1, value = 0, width = "100%"
+    )
   })
-  
+
   output$rb_rankswap_p_k0_r0 <- renderUI({
     txt_tooltip <- "<b>K0:</b><br />"
     txt_tooltip <- paste0(txt_tooltip, "The algorithm keeps the change in the means of the variables before and after rank swapping within a range based on the subset-mean preservation factor K_0. ")
@@ -442,27 +475,33 @@ output$ui_rankswap <- renderUI({
     txt_tooltip <- paste0(txt_tooltip, "<br><b>P:</b><br />")
     txt_tooltip <- paste0(txt_tooltip, "This parameter (P) describes the size of the rank range as percentage of the total sample size. So two records are eligible for swapping if their ranks, i and j respectively, satisfy abs(i-j) < P*N/100, where N is the total sample size.")
     rb_rankswap_p_k0_r0 <- radioButtons("rb_rankswap_p_k0_r0",
-                                        label=p("Method to compute swap rate:", tipify(icon("circle-info"),
-                                                                                       title=txt_tooltip, placement="top")),
-                                        choices=c("K0","R0","P"), width="100%", selected=input$rb_rankswap_p_k0_r0, inline=TRUE)
+      label = p("Method to compute swap rate:", tipify(icon("circle-info"),
+        title = txt_tooltip, placement = "top"
+      )),
+      choices = c("K0", "R0", "P"), width = "100%", selected = input$rb_rankswap_p_k0_r0, inline = TRUE
+    )
   })
-  
+
   output$sl_rankswap_p_k0_r0 <- renderUI({
     txt_tooltip <- "For K0 and R0 a value between 0 and 1 will be used directly and for P it will be multiplied by 100."
     sliderInput("sl_rankswap_p_k0_r0",
-                label=p("Set rank range as percentage of total sample size.", tipify(icon("circle-info"), title=txt_tooltip, placement="top")),
-                min=0, max=1, step=0.01, value=0.95, width="100%")
+      label = p("Set rank range as percentage of total sample size.", tipify(icon("circle-info"), title = txt_tooltip, placement = "top")),
+      min = 0, max = 1, step = 0.01, value = 0.95, width = "100%"
+    )
   })
- 
+
   out <- fluidRow(
-    column(4, uiOutput("ui_rankswap_vars"), align="center"),
-    column(4, uiOutput("sl_rankswap_bot"), align="center"),
-    column(4, uiOutput("sl_rankswap_top"), align="center"))
+    column(4, uiOutput("ui_rankswap_vars"), align = "center"),
+    column(4, uiOutput("sl_rankswap_bot"), align = "center"),
+    column(4, uiOutput("sl_rankswap_top"), align = "center")
+  )
   out <- list(out, fluidRow(
-    column(8, uiOutput("rb_rankswap_p_k0_r0"), align="center"),
-    column(4, uiOutput("sl_rankswap_p_k0_r0"), align="center")))
+    column(8, uiOutput("rb_rankswap_p_k0_r0"), align = "center"),
+    column(4, uiOutput("sl_rankswap_p_k0_r0"), align = "center")
+  ))
 
   out <- list(out, fluidRow(
-    column(12, uiOutput("ui_rankswap_btn"), align="center")))
+    column(12, uiOutput("ui_rankswap_btn"), align = "center")
+  ))
   out
 })
