@@ -90,29 +90,6 @@ output$ui_about <- renderUI({
     ))
   }
 
-  pp <- textInput("path_export_data",
-    label = p("Enter a directory where any exported files (data, script, problem instances) should be saved to"),
-    placeholder = paste("e.g:", obj$path_export), width = "80%"
-  )
-  stop_btn <- bsButton("stop_sdcApp", label = "Stop the GUI", style = "primary", size = "extra-small", class = "wb-btn-inline", onclick = "setTimeout(function(){window.close();},500);")
-  out <- list(out, fluidRow(
-    column(width = 8, offset = 2, h4(("Set storage path"))),
-    column(width = 8, offset = 2, p("Currently, all output, such as anonymized data, scripts and reports, will be saved to", code(obj$path_export), ".")),
-    column(width = 8, offset = 2, p("You can change the default path, where all output from the GUI will be saved. You can change this path any time
-      later as well by returing to this tab.")), column(width = 8, offset = 2, pp),
-    column(width = 8, offset = 2, uiOutput("btn_update_export_path")),
-    column(width = 8, offset = 2, h4(("Stop the interface"))),
-    column(width = 8, offset = 2, p(
-      "By clicking ", stop_btn, ", you can stop the graphical user interface at any time during the anonymization process.
-      If you have started the interface as", code("x <- sdcApp()"), ",", code("x"),
-      "will contain the micro data and the sdc problem at the state just before stopping the GUI."
-    )),
-    column(width = 8, offset = 2, h4(("Restart the interface"))),
-    column(width = 8, offset = 2, p("Should you accidentally close this browser window, you can open your current problem instance by entering the local IP address
-      specified in the", code("R"), "console in which you started the GUI. The address starts with", code("http://127.0.0.1:"), ". You
-      can also use the refresh button of your browser in case the GUI freezes."))
-  ))
-
   out <- list(out, fluidRow(
     column(width = 8, offset = 2, h4(("Contact and Feedback"))),
     column(width = 8, offset = 2, p(

@@ -636,7 +636,7 @@ output$setupTable <- DT::renderDataTable(
   {
     sdcData()
   },
-  server = FALSE,
+  server = TRUE,
   escape = FALSE,
   rownames = FALSE,
   selection = "none",

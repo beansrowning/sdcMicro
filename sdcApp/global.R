@@ -404,12 +404,7 @@ obj$stata_labs <- NULL
 obj$stata_varnames <- NULL
 
 # the path, where all output will be saved to
-pp <- getShinyOption(".startdir", getwd())
-if (file.access(pp, mode = 2) == 0) {
-  obj$path_export <- pp
-} else {
-  obj$path_export <- tempdir()
-}
+obj$path_export <- tempdir()
 
 # is available in exported problem instances
 # helpful for debugging
