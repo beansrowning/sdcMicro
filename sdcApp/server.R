@@ -12,6 +12,8 @@ shinyServer(function(session, input, output) {
     values$starting <- FALSE
   })
 
+  mod_file_input_data_server("file-import", obj)
+
   # dynamically generate inputs (currently used in setup-sdcProblem)
   shinyInput <- function(FUN, len, id, ...) {
     inputs <- character(len)
@@ -724,7 +726,7 @@ shinyServer(function(session, input, output) {
       obj$last_error <- NULL
       obj$inputdata <- res
       obj$utf8 <- !all(sapply(attr(obj$inputdata, "nonUTF"), is.null))
-      code_out <- gsub(input$file1$datapath, input$file1$name, code)
+      code_out <- gsub(normalizePath(input$file1$datapath, winslash = "/"), input$file1$name, code)
       code_out <- gsub("res", "inputdata", code_out)
       obj$code_read_and_modify <- code_out
       obj$inputdataB <- obj$inputdata

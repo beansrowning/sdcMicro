@@ -100,7 +100,7 @@ output$ui_export_data <- renderUI({
   })
   rb_exptype <- radioButtons("dat_exp_type",
     label = p("Select file format for export", align = "center"),
-    choices = c("R-dataset (.RData)" = "rdata", "SPSS-file (.sav)" = "sav", "CSV-file (.csv)" = "csv", "STATA-file (.dta)" = "dta", "SAS-file (.sas7bdat)" = "sas"),
+    choices = c("Excel File" = "xlsx", "R-dataset (.RDS)" = "rds", "SPSS-file (.sav)" = "sav", "CSV-file (.csv)" = "csv", "STATA-file (.dta)" = "dta", "SAS-file (.sas7bdat)" = "sas"),
     width = "100%", selected = input$dat_exp_type, inline = TRUE
   )
 
@@ -136,8 +136,8 @@ output$ui_export_data <- renderUI({
     }
 
     output$rb_randomize_export <- renderUI({
-      curObj <- sdcObj()
-      if (is.null(curObj)) {
+
+      if (is.null(sdcObj())) {
         return(NULL)
       }
       txt_randomize <- "Often the order of the records can be used to reconstruct the original data, such as suppressed values. To prevent this, it is advisable to randomize the order of records before releasing the data."
@@ -152,7 +152,7 @@ output$ui_export_data <- renderUI({
         "Randomize by hierarchical identifier" = "byHH", "Randomize by hierarchical identifier and within hierarchical units" = "withinHH"
       )
 
-      if (!is.null(curObj@hhId)) {
+      if (!is.null(sdcObj()@hhId)) {
         rb <- radioButtons("rb_export_randomizeorder", label = p("Randomize order of records", tipify(icon("circle-info"), title = txt_randomize_hh, placement = "top")), choices = choices[-2], inline = TRUE)
       } else {
         rb <- radioButtons("rb_export_randomizeorder", label = p("Randomize order of records", tipify(icon("circle-info"), title = txt_randomize_ind, placement = "top")), choices = choices[1:2], inline = TRUE)
@@ -163,14 +163,54 @@ output$ui_export_data <- renderUI({
     })
     out <- list(out, uiOutput("rb_randomize_export"))
     out <- list(out, fluidRow(
-      column(12, myActionButton("btn_export_anon_data", "Save dataset", btn.style = "primary"), align = "center")
+      column(12,
+      downloadButton("btn_export_anon_data", "Save dataset", class = "btn-primary"),
+      align = "center")
     ))
 
-    if (!is.null(obj$lastdataexport) & is.null(lastError())) {
-      out <- list(out, fluidRow(
-        column(12, tags$br(), p("The dataset was saved as", code(obj$lastdataexport)), align = "center")
-      ))
-    }
+    output$btn_export_anon_data <- downloadHandler(
+      filename = function() {
+        sprintf("anonymized_data.%s", input$dat_exp_type)
+      },
+      content = function(file) {
+
+        # Weird modifications to Stata data that I don't fully understand
+        if (input$dat_exp_type == "dta") {
+          newlabs <- obj$stata_labs # original labs
+          current_labs <- obj$stata_varnames # after changing the interactive table
+
+          # meta-information is available
+          if (!is.null(current_labs)) {
+            for (i in seq_along(current_labs)) {
+              newlabs <- sdcMicro:::changeVarLabel(newlabs, varname = current_labs$var.names[i], newlabel = current_labs$var.label[i])
+            }
+            obj$stata_labs <- newlabs
+          }
+        }
+
+        # return data frame from SDC Object
+        out_data <- extractManipData(
+          obj$sdcObj,
+          randomizeRecords = input$rb_export_randomizeorder
+        )
+
+        switch(
+          input$dat_exp_type,
+          dta = haven::write_dta(out_data, file),
+          sas = haven::write_sas(out_data, file),
+          xlsx = writexl::write_xlsx(out_data, file),
+          csv = data.table::fwrite(out_data, file),
+          rds = saveRDS(out_data, file),
+          # Otherwise
+          showModal(modalDialog(
+            title = "Error",
+            paste("Unsupported file type:", input$dat_exp_type),
+            easyClose = TRUE,
+            footer = NULL
+          ))
+        )
+      }
+    )
   }
   out
 })
@@ -268,23 +308,18 @@ output$ui_export_sidebar_left <- renderUI({
   return(uiOutput("ui_sel_export_btns"))
 })
 
+mod_return_to_input_server("ui_export", session)
+
 output$ui_export <- renderUI({
-  if (is.null(inputdata())) {
-    return(list(
-      noInputData(uri = "ui_export_data"),
-      fluidRow(column(12, tags$br(), p("or go to the Undo tab and upload a previously saved problem instance."), align = "center")),
-      fluidRow(column(12, myActionButton("nodata_script_uploadproblem", label = "Upload a previously saved problem", btn.style = "primary"), align = "center"))
-    ))
+
+  
+  if (is.null(obj$inputdata)) {
+    return(mod_return_to_input_ui("ui_export"))
   }
-  if (is.null(sdcObj())) {
-    return(list(
-      noSdcProblem(uri = "ui_export_data"),
-      fluidRow(column(12, tags$br(), p("or go to the Undo tab and upload a previously saved problem instance."), align = "center")),
-      fluidRow(column(12, myActionButton("nodata_export_uploadproblem", label = "Upload a previously saved problem", btn.style = "primary"), align = "center"))
-    ))
-  }
+
   return(fluidRow(
     column(2, uiOutput("ui_export_sidebar_left"), class = "wb_sidebar"),
     column(10, uiOutput("ui_export_main"), class = "wb-maincolumn")
   ))
 })
+
