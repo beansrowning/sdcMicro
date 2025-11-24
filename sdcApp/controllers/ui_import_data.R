@@ -144,6 +144,7 @@ output$ui_import_data_sidebar_left <- renderUI({
   eval(parse(text = genObserver_menus(pat = "btn_import_data_", n = 1:6, updateVal = "cur_selection_import")))
   return(uiOutput("ui_sel_resbtns_import"))
 })
+
 output$ui_import_data <- renderUI({
   fluidRow(
     column(2, uiOutput("ui_import_data_sidebar_left"), class = "wb_sidebar"),

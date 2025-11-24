@@ -11,7 +11,10 @@ source("modules/microdata_import.R")
 source("modules/bt_to_input.R")
 .startdir <- .guitheme <- .guijsfile <- NULL
 maxRequestSize <- 50
-options(shiny.maxRequestSize = ceiling(maxRequestSize) * 1024^2)
+options(
+  shiny.maxRequestSize = ceiling(maxRequestSize) * 1024^2,
+  stringsAsFactors = TRUE
+)
 
 shinyOptions(.startdir = getwd())
 
