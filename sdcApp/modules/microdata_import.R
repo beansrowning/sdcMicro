@@ -74,6 +74,10 @@ mod_file_input_data_server <- function(id, obj) {
         df <- NULL
       }
 
+      # Convert all character columns to factors
+      df <- df |>
+        mutate(across(where(is.character), as.factor))
+
       # Drop completely empty columns by default
       # and store the col names in an attribute
       empty_cols <- vapply(df, \(x) all(is.na(x)), logical(1)) |>
