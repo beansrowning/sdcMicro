@@ -34,3 +34,4 @@ inst/shiny/sdcApp/www/.sass-cache
 ihsn-extra-sidebar.css.map
 docs
 *.csv
+*.Rprof
